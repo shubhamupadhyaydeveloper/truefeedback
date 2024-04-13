@@ -14,3 +14,17 @@ export type TuserSchema = Document & {
 export type TmessageSchema = Document & {
     content : string
 }
+
+
+export type TapiResponse = {
+    success : boolean,
+    message : string,
+    isAcceptingMessage? : boolean,
+    messages? : TmessageSchema[]
+}
+
+export type Tsignup = {
+    username : string,
+    email : string,
+    password : string
+}
