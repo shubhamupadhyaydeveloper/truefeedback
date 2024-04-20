@@ -9,15 +9,15 @@ export async function sendVerificationEmail(
 ): Promise<TapiResponse> {
     try {
         await resend.emails.send({
-            from: '<onboarding@resend.dev>',
+            from: 'onboarding@resend.dev',
             to: email,
             subject: 'Signup Verificaiton Code',
             react: VerificationEmail({username,otp : verifyCode}) ,
           });
 
-        return { success: false, message: 'Error in sendVerificationError' }
+        return { success: true, message: 'send Verification successful' }
     } catch (error) {
         console.error('Erron in sendVerificationError', error)
-        return { success: false, message: 'Error in sendVerificationError' }
+        return { success: false, message: `Error in sendVerificationError ` }
     }
 }

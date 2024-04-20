@@ -11,6 +11,9 @@ connectToMongodb()
 export async function POST(request: NextRequest) {
   try {
     const { username, email, password }: Tsignup = await request.json()
+    
+    if(!username || !email || !password) return NextResponse.json({message : 'credential are missing in request'})
+ 
     const hashedPassword = await bcrypt.hash(password, 10)
     const expiryDate = new Date()
     expiryDate.setHours(expiryDate.getHours() + 1)
@@ -33,6 +36,7 @@ export async function POST(request: NextRequest) {
       } else {
         userFindByEmail.password = hashedPassword
         userFindByEmail.verifyCodeExpiry = expiryDate
+         
         userFindByEmail.verifyCode = codeGenerator
         await userFindByEmail.save()
       }
