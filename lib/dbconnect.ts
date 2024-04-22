@@ -22,6 +22,5 @@ export async function connectToMongodb() {
         
     } catch (error) {
         console.error('Error in connect mongodb',error)
-        process.exit(1)
     }
 }

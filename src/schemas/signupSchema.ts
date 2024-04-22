@@ -2,9 +2,9 @@ import {z} from 'zod'
 
 export const usernameSchema = z
 .string()
-.min(2,'usename more than 2 digit')
-.max(30,'username not more than 30 digit')
-.regex(/^[a-zA-Z0-9_]+$/,'username not contain special character')
+.min(3, 'Username must be at least 2 characters')
+.max(30, 'Username must be no more than 30 characters')
+.regex(/^[a-zA-Z0-9_]+$/, 'Username must not contain special characters');
 
 
 export const signupSchema = z.object({
