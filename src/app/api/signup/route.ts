@@ -17,6 +17,9 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10)
     const expiryDate = new Date()
     expiryDate.setHours(expiryDate.getHours() + 1)
+
+    // expiryDate.setMonth(expiryDate.getMonth() + 3)
+    
     const codeGenerator = Math.floor(100000 + Math.random() * 899999).toString()
 
     const userFindByUsername = await User.findOne({

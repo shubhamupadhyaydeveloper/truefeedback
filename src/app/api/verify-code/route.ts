@@ -1,7 +1,10 @@
 import User from "@/models/user.model";
 import {NextRequest,NextResponse} from 'next/server'
+import { connectToMongodb } from "../../../../lib/dbconnect";
+
 
 export async function POST(request:NextRequest) {
+  await connectToMongodb()
   try {
 
     const {username,verifycode} = await request.json();

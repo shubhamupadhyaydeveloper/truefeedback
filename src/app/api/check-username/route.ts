@@ -10,7 +10,7 @@ const checkUsernameSchema = z.object({
 
 export async function GET(request: NextRequest) {
   // mongodb connection
-  connectToMongodb();
+  await connectToMongodb();
 
 
   try {
