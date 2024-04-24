@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
      return NextResponse.json({success : false , message : "username is registerd"})
    }
   
-   return NextResponse.json({success : true , message : 'username is not taken'})
+   return NextResponse.json({success : true , message : 'username is available'})
 
   } catch (error) {
     console.error("Error in check-username", error);

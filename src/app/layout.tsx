@@ -26,7 +26,7 @@ export default function RootLayout({
         )}
       >
         <AuthProvider>
-          <Toaster />
+          <Toaster richColors/>
           {children}
         </AuthProvider>
       </body>

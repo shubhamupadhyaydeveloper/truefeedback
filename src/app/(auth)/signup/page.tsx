@@ -1,94 +1,157 @@
-'use client'
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { signupSchema, usernameSchema } from "@/schemas/signupSchema"
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useDebounceCallback } from 'usehooks-ts'
-import { Loader2 } from "lucide-react"
-import {toast} from 'sonner'
-import {useForm,FieldValues} from 'react-hook-form'
-import {z} from 'zod'
-import { useState } from "react"
+"use client";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {Form,FormControl,FormField,FormItem,FormLabel,FormMessage} from "@/components/ui/form";
+import {Card,CardContent,CardDescription,CardHeader, CardTitle,} from "@/components/ui/card"
+import { Input } from "@/components/ui/input";
+import { signupSchema } from "@/schemas/signupSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useDebounceCallback } from "usehooks-ts";
+import { Loader2 } from "lucide-react";
+import axios from 'axios'
+import { toast } from "sonner";
+import { useForm, FieldValues } from "react-hook-form";
+import { z } from "zod";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+type TsignupApiResponse = {
+  message : string,
+  success : boolean
+}
 
 const Signup = () => {
+  const [username, setUsername] = useState<string>('');
+  const router = useRouter()
+  const [backendMessage ,setBackendMessage] = useState<TsignupApiResponse>()
+  const debounced = useDebounceCallback(setUsername, 300);
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+    },
+  });
 
-  const [username , setUsername] = useState<string>('')
-  const [isCheckingUsername , setIsCheckingUsername] = useState<boolean>(false)
-  const debounced = useDebounceCallback(setUsername , 400)
-  const {register,handleSubmit,formState : {errors,isSubmitting} , reset} = useForm<z.infer<typeof signupSchema>>({
-    resolver : zodResolver(signupSchema)
-  })
+  useEffect(() => {
+    const checkUniqueUsername = async () => {
+          try {
+            if(username?.length === 1 || username?.length > 1) {
+              const request = axios.get(`/api/check-username?username=${username}`)
+              const {data} = await request
+              setBackendMessage(data)
+            }
+          } catch (error) {
+            console.log('Error in checkusername')
+          }
+    }
+    checkUniqueUsername()
 
-  const handleForm = (data: FieldValues) => {
-       console.log(data)
-       reset()
-  }
+  },[username])
 
-    return (
-        <div className="flex justify-center items-center h-screen">
-        <form onSubmit={handleSubmit(handleForm)}>
-        <Card className="mx-auto max-w-sm">
-          <CardHeader>
-            <CardTitle className="text-xl">Sign Up</CardTitle>
-            <CardDescription>
-              Enter your information to create an account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <div className="grid">
-                <div className="grid gap-2">
-                  <Label htmlFor="Username">Username</Label>
-                  <Input id="Username" placeholder="Max" required 
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
+
+  const onsubmit = async (data: FieldValues) => {
+    try {
+      const request = await axios.post('/api/signup',data)
+      if(request.data.success === true) {
+         toast.success(request.data.message)
+         router.push(`/verify-username?username=${username}`)
+      } else {
+        toast.error(request.data.message)
+      }
+    } catch (error) {
+      console.log('Error in send SignUp api',error)
+    } finally {
+      form.reset()
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Sign Up</CardTitle>
+        <CardDescription>
+          Enter your information to create an account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onsubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="Max" {...field} required 
+                   onChange={event => {
+                    field.onChange(event)
+                    debounced(event.target.value)
+                   }}
                   />
-                 
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  {...register('email')}
-                />
-                {errors.email && (<p className="text-red-600 text-md">{errors.email.message}</p>)}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required
-                 {...register('password')}
-                />
-                {errors.password && (<p className="text-red-600 text-md">{errors.password.message}</p>)}
-              </div>
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create an account
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/signin" className="underline">
-                Sign in
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+                </FormControl>
+                 {
+                   backendMessage?.success === false ? (
+                    backendMessage.message.length > 24 ? (
+                      <p className="text-red-600 text-[12.5px]">{backendMessage?.message}</p>
+                    ) : (
+                      <p className="text-red-600 text-md">{backendMessage?.message}</p>
+                    )
+                   ) : (
+                     username.length == 1 || username.length > 1 &&
+                    <p className="text-green-600 text-md">{backendMessage?.message}</p>
+                   )
+                 }
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="abc@gmail.com" {...field}  required/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input placeholder="password" {...field} type="password"  required/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Submit
+            </Button>
         </form>
+      </Form>
+
+      <div className="mt-4 text-center text-sm">
+          Already have an account?{" "}
+          <Link href="/signin" className="underline">
+            Sign in
+          </Link>
         </div>
-      )
-}
+      </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 export default Signup;
