@@ -15,14 +15,14 @@ export async function POST(request:NextRequest) {
     const isExpiryValid = new Date(user.verifyCodeExpiry) > new Date()
 
     if(!isCodeMatch || !isExpiryValid) {
-         return NextResponse.json({success : false, message : "Invalid verifyCode or verifyCodeExpiry"})
+         return NextResponse.json({success : false, message : "Invalid verifyCode or verifyCodeExpiry"},{status : 401})
     }
 
     user.isVerified = true
     user.verifyCodeExpiry = new Date(0)
     await user.save()
 
-    return NextResponse.json({success : true , message : 'user verified succesfully'})
+    return NextResponse.json({success : true , message : 'user verified succesfully'},{status : 200})
     
   } catch (error) {
     console.log('Error in verify-code')

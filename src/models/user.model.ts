@@ -6,12 +6,10 @@ const userSchema = new mongoose.Schema<TuserSchema>({
      type : String,
      required : [true,'username is required'],
      trim  : true,
-     unique : true
    },
    email : {
      type : String,
      required : [true,'email is required'],
-     unique  : true,
      match : [/.+\@.+\../,'email not valid']
    },
    password : {

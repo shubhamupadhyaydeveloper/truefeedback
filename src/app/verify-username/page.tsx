@@ -16,10 +16,9 @@ import { useForm, FieldValues } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
-
-const codeSchema = z.object({
-  code: z.number().min(6, "code should be 6 digit"),
-});
+import { verifySchema } from "@/schemas/verifySchema";
+import axios from 'axios'
+import { toast } from "sonner";
 
 const page = () => {
   const router = useRouter();
@@ -28,15 +27,25 @@ const page = () => {
     register,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<z.infer<typeof codeSchema>>({
-    resolver: zodResolver(codeSchema),
+  } = useForm<z.infer<typeof verifySchema>>({
+    resolver: zodResolver(verifySchema),
   });
   const username = useSearchParams().get("username");
-  console.log(username);
+
 
   const hadleForm = async (data :FieldValues) => {
-    console.log(data)
-    reset()
+   try {
+     const payload = {username , verifycode : data.code}
+     const response = await axios.post('/api/verify-code',payload)
+     console.log(response)
+     if(response.data.success === true) {
+       toast.success(response.data.message)
+     } 
+     reset()
+   } catch (error:any) {
+     console.log('Error in verifycode')
+     toast.error(error.response.data.message)
+   }
   }
 
   return (
@@ -53,7 +62,7 @@ const page = () => {
             <div className="grid mb-4">
               <div className="grid gap-2">
                 <Input
-                  type="number"
+                  type="text"
                   required
                   placeholder="enter your code"
                   {...register("code")}

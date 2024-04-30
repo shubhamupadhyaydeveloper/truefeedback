@@ -18,7 +18,7 @@ export async function connectToMongodb() {
     
     connection.isConnected = db.connections[0].readyState
     
-   console.log('connected with new connection')
+    console.log('connected with new connection')
         
     } catch (error) {
         console.error('Error in connect mongodb',error)

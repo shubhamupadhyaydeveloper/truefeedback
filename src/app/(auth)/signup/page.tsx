@@ -53,17 +53,19 @@ const Signup = () => {
 
   const onsubmit = async (data: FieldValues) => {
     try {
-      const request = await axios.post('/api/signup',data)
-      if(request.data.success === true) {
-         toast.success(request.data.message)
+      const response = await axios.post('/api/signup',data)
+      console.log(response)
+      if(response.data.success === true) {
+         toast.success(response.data.message)
          router.push(`/verify-username?username=${username}`)
-      } else {
-        toast.error(request.data.message)
       }
-    } catch (error) {
+     
+    } catch (error:any) {
       console.log('Error in send SignUp api',error)
+      toast.error(error?.response.data.message)
     } finally {
       form.reset()
+      setUsername('')
     }
   };
 
