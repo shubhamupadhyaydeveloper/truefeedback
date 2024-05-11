@@ -70,7 +70,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-[90vh]">
       <Card>
       <CardHeader>
         <CardTitle className="text-xl">Sign Up</CardTitle>

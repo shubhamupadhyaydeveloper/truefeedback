@@ -41,10 +41,12 @@ const page = () => {
      if(response.data.success === true) {
        toast.success(response.data.message)
      } 
-     reset()
+     router.push('/signin')
    } catch (error:any) {
      console.log('Error in verifycode')
      toast.error(error.response.data.message)
+   } finally {
+    reset()
    }
   }
 

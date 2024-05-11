@@ -49,7 +49,7 @@ const Signin = () => {
       }
 
       if(response?.url) {
-        router.push('/')
+        router.push('/dashboard')
       }
     } catch {
       toast.error('envalid email or password');
@@ -60,7 +60,7 @@ const Signin = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-[90vh]">
         <Card className="w-[350px]">
           <CardHeader>
             <CardTitle>Login</CardTitle>
